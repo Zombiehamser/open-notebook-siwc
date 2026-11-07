@@ -1,4 +1,4 @@
-> **Неофициальный SIWC-форк.** Официальный вход ChatGPT для личной подписки, текстовый чат, Ask и преобразования документов. Embeddings и OCR могут работать локально. [Установка, ограничения и тесты](open_notebook/ai/SIWC.md). MIT сохранена; одобрение OpenAI или автора Open Notebook не подразумевается.
+> **Unofficial SIWC fork.** Adds official Sign in with ChatGPT for personal subscriptions, text chat, Ask, and document transformations. Embeddings and OCR can run locally. [Setup, limitations, and tests](open_notebook/ai/SIWC.md). The MIT license is retained; no endorsement by OpenAI or the Open Notebook author is implied.
 
 <a id="readme-top"></a>
 
