@@ -220,6 +220,29 @@ class ModelManager:
         ]:
             raise ConfigurationError(f"Invalid model type: {model.type}")
 
+        if model.provider == "chatgpt_siwc":
+            from open_notebook.ai.siwc import SIWCLanguageModel
+            from open_notebook.ai.siwc_auth import SIWCConfigurationError
+
+            credential = await model.get_credential_obj()
+            account = (
+                (credential.config or {}).get("siwc_client_id") if credential else None
+            )
+            if (
+                model.type != "language"
+                or not credential
+                or credential.provider != "chatgpt_siwc"
+                or not account
+            ):
+                raise SIWCConfigurationError(
+                    "Register this language model using the SIWC CLI first."
+                )
+            return SIWCLanguageModel(
+                model_name=model.name,
+                account_id=account,
+                config={"structured": kwargs.get("structured")},
+            )
+
         # Build config from credential if linked, otherwise fall back to env vars
         config: dict = {}
         if model.credential:

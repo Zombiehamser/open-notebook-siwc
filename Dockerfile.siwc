@@ -1,0 +1,7 @@
+# Reuse the stable runtime and unchanged compiled frontend; add only our source.
+ARG UPSTREAM_IMAGE=lfnovo/open_notebook@sha256:e4e18f12653df5bf48674b7b187c4252be52238b4d706330fd30d9b177b95812
+FROM ${UPSTREAM_IMAGE}
+COPY open_notebook /app/open_notebook
+COPY api /app/api
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+LABEL org.opencontainers.image.title="Open Notebook SIWC Community Fork (unofficial prototype)"

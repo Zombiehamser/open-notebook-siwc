@@ -1,0 +1,37 @@
+name: SIWC upstream compatibility
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_tag:
+        description: Stable upstream tag to test in an isolated checkout
+        required: true
+        default: v1.15.0
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Merge selected upstream in this temporary checkout
+        env:
+          UPSTREAM_TAG: ${{ inputs.upstream_tag }}
+        run: |
+          [[ "$UPSTREAM_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          git config user.name "SIWC compatibility check"
+          git config user.email "ci@example.invalid"
+          git fetch --no-tags https://github.com/lfnovo/open-notebook.git "refs/tags/$UPSTREAM_TAG"
+          git merge --no-commit --no-ff FETCH_HEAD
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7
+      - run: uv sync --locked
+      - run: uv run pytest tests/
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run python -m mypy .
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+      - run: npm ci && npm run test && npm run lint && npm run build
+        working-directory: frontend

@@ -22,6 +22,7 @@ from open_notebook.ai.provider_registry import PROVIDERS
 
 KNOWN_GOOD_PROVIDERS = [
     "openai",
+    "chatgpt_siwc",
     "anthropic",
     "google",
     "groq",

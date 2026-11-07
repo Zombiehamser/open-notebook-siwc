@@ -1,3 +1,4 @@
+import asyncio
 import operator
 import os
 from pathlib import Path
@@ -19,6 +20,7 @@ from open_notebook.domain.content_settings import ContentSettings
 from open_notebook.domain.notebook import Asset, Source
 from open_notebook.domain.transformation import Transformation
 from open_notebook.graphs.transformation import graph as transform_graph
+from open_notebook.utils.local_pdf_ocr import ocr_pdf
 from open_notebook.utils.runtime_capabilities import engine_runtime_missing
 from open_notebook.utils.url_validation import validate_url
 
@@ -266,6 +268,19 @@ async def content_process(state: SourceState) -> dict:
     except cc.ContentCoreError as e:
         logger.warning(f"content-core extraction failed ({type(e).__name__}): {e}")
         raise _extraction_error(e, url) from e
+
+    if (
+        not (processed.content or "").strip()
+        and os.environ.get("OPEN_NOTEBOOK_LOCAL_PDF_OCR", "").lower() == "true"
+        and Path(content_state.get("file_path") or "").suffix.lower() == ".pdf"
+    ):
+        text = await asyncio.to_thread(ocr_pdf, content_state["file_path"])
+        processed = processed.model_copy(
+            update={
+                "content": text,
+                "title": processed.title or Path(content_state["file_path"]).stem,
+            }
+        )
 
     # Since content-core 2.2, empty content means the source was genuinely
     # empty; extraction failures raise (handled above).

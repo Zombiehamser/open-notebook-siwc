@@ -590,6 +590,7 @@ class MigrationResult(BaseModel):
 # The frontend consumes GET /api/providers at runtime and needs no edit.
 SupportedProvider = Literal[
     "openai",
+    "chatgpt_siwc",
     "anthropic",
     "google",
     "groq",

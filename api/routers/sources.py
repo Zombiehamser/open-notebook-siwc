@@ -965,11 +965,6 @@ async def retry_source_processing(source_id: str):
         )
         notebook_ids = [str(nb_id) for nb_id in references] if references else []
 
-        if not notebook_ids:
-            raise HTTPException(
-                status_code=400, detail="Source is not associated with any notebooks"
-            )
-
         # Prepare content_state based on source asset
         content_state = {}
         if source.asset:

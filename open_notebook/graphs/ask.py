@@ -49,6 +49,7 @@ class Strategy(BaseModel):
     searches: List[Search] = Field(
         default_factory=list,
         description="You can add up to five searches to this strategy",
+        max_length=5,
     )
 
 

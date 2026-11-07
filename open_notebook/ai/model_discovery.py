@@ -925,6 +925,7 @@ async def discover_omlx_models() -> List[DiscoveredModel]:
 # Map provider names to their discovery functions
 PROVIDER_DISCOVERY_FUNCTIONS = {
     "openai": discover_openai_models,
+    "chatgpt_siwc": None,  # Account-specific: use credential-based discovery.
     "anthropic": discover_anthropic_models,
     "google": discover_google_models,
     "ollama": discover_ollama_models,

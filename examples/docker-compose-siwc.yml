@@ -1,0 +1,41 @@
+# Copy .env.example to a PRIVATE runtime directory and set unique local secrets.
+# Do not commit .env, runtime data, or the siwc_auth volume.
+name: open-notebook-siwc
+x-app-environment: &app-environment
+  OPEN_NOTEBOOK_ENCRYPTION_KEY: ${OPEN_NOTEBOOK_ENCRYPTION_KEY:?Set a local encryption key}
+  SURREAL_URL: ws://database:8000/rpc
+  SURREAL_USER: ${SURREAL_USER:-root}
+  SURREAL_PASSWORD: ${SURREAL_PASSWORD:?Set a local database password}
+  SURREAL_NAMESPACE: open_notebook
+  SURREAL_DATABASE: open_notebook
+  API_URL: http://127.0.0.1:${SIWC_API_PORT:-5056}
+  OPEN_NOTEBOOK_SIWC_AUTH_DIR: /siwc-auth
+  OPEN_NOTEBOOK_SIWC_PROXY: ${OPEN_NOTEBOOK_SIWC_PROXY:?Set an explicit proxy reachable from Docker}
+  OPEN_NOTEBOOK_WORKER_MAX_TASKS: "1"
+services:
+  database:
+    image: surrealdb/surrealdb@sha256:d653f6c8a89e81f865ee31cd2f587c50f50ace922175e04150b1e385d2f86011
+    user: root
+    command: [start, --log, error, --user, "${SURREAL_USER:-root}", --pass, "${SURREAL_PASSWORD}", "rocksdb:/mydata/mydatabase.db"]
+    volumes: ["database:/mydata"]
+    restart: unless-stopped
+  app:
+    image: open-notebook-siwc:prototype
+    environment: *app-environment
+    ports: ["127.0.0.1:${SIWC_UI_PORT:-8503}:8502", "127.0.0.1:${SIWC_API_PORT:-5056}:5055"]
+    volumes: ["data:/app/data", "siwc_auth:/siwc-auth"]
+    depends_on: [database]
+    restart: unless-stopped
+  auth:
+    image: open-notebook-siwc:prototype
+    profiles: [login]
+    environment: *app-environment
+    ports: ["127.0.0.1:18557:18557"]
+    volumes: ["siwc_auth:/siwc-auth"]
+    entrypoint: [/app/.venv/bin/python, -m, open_notebook.siwc_cli]
+    command: [login, --bind, 0.0.0.0]
+    restart: "no"
+volumes:
+  database:
+  data:
+  siwc_auth:

@@ -192,21 +192,32 @@ class TestRetrySourceProcessing:
         assert str(source.command).startswith("command:")
 
     @pytest.mark.asyncio
+    @patch(
+        "api.routers.sources.CommandService.submit_command_job", new_callable=AsyncMock
+    )
     @patch("api.routers.sources.repo_query", new_callable=AsyncMock)
     @patch("api.routers.sources.Source.get", new_callable=AsyncMock)
-    async def test_retry_400_only_when_truly_unlinked(
-        self, mock_get, mock_repo_query, client
+    async def test_retry_global_source_without_notebook(
+        self, mock_get, mock_repo_query, mock_submit, client
     ):
         source = MagicMock()
         source.id = "source:1"
         source.command = None
+        source.title = "Global scan"
+        source.topics = []
+        source.full_text = None
+        source.asset = MagicMock(file_path=None, url="https://example.com/file.pdf")
+        source.save = AsyncMock()
+        source.get_embedded_chunks = AsyncMock(return_value=0)
         mock_get.return_value = source
-        mock_repo_query.return_value = []  # genuinely no notebooks
+        mock_repo_query.return_value = []
+        mock_submit.return_value = "command:123"
 
         response = client.post("/api/sources/source:1/retry")
 
-        assert response.status_code == 400
-        assert "not associated with any notebooks" in response.json()["detail"]
+        assert response.status_code == 200
+        assert mock_submit.await_args.args[2]["notebook_ids"] == []
+        assert str(source.command).count("command:") == 1
 
 
 class TestGetSourceNotFound:

@@ -162,11 +162,11 @@ worker: worker-start
 
 worker-start:
 	@echo "Starting surreal-commands worker..."
-	uv run --env-file .env surreal-commands-worker --import-modules commands --max-tasks "$${OPEN_NOTEBOOK_WORKER_MAX_TASKS:-5}"
+	uv run --env-file .env python -m open_notebook.queue_worker
 
 worker-stop:
 	@echo "Stopping surreal-commands worker..."
-	pkill -f "surreal-commands-worker" || true
+	pkill -f "open_notebook.queue_worker" || true
 
 worker-restart: worker-stop
 	@sleep 2
@@ -182,7 +182,7 @@ start-all:
 	@uv run run_api.py &
 	@sleep 3
 	@echo "⚙️ Starting background worker..."
-	@uv run --env-file .env surreal-commands-worker --import-modules commands --max-tasks "$${OPEN_NOTEBOOK_WORKER_MAX_TASKS:-5}" &
+	@uv run --env-file .env python -m open_notebook.queue_worker &
 	@sleep 2
 	@echo "🌐 Starting Next.js frontend..."
 	@echo "✅ All services started!"
@@ -194,7 +194,7 @@ start-all:
 stop-all:
 	@echo "🛑 Stopping all Open Notebook services..."
 	@pkill -f "next dev" || true
-	@pkill -f "surreal-commands-worker" || true
+	@pkill -f "open_notebook.queue_worker" || true
 	@pkill -f "run_api.py" || true
 	@pkill -f "uvicorn api.main:app" || true
 	@docker compose down
@@ -207,7 +207,7 @@ status:
 	@echo "API Backend:"
 	@pgrep -f "run_api.py\|uvicorn api.main:app" >/dev/null && echo "  ✅ Running" || echo "  ❌ Not running"
 	@echo "Background Worker:"
-	@pgrep -f "surreal-commands-worker" >/dev/null && echo "  ✅ Running" || echo "  ❌ Not running"
+	@pgrep -f "open_notebook.queue_worker" >/dev/null && echo "  ✅ Running" || echo "  ❌ Not running"
 	@echo "Next.js Frontend:"
 	@pgrep -f "next dev" >/dev/null && echo "  ✅ Running" || echo "  ❌ Not running"
 

@@ -73,6 +73,10 @@ FROM python:3.12-slim-trixie AS runtime-base
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     ffmpeg \
     supervisor \
+    poppler-utils \
+    tesseract-ocr \
+    tesseract-ocr-rus \
+    tesseract-ocr-eng \
     curl \
     && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \

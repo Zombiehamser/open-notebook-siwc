@@ -7,6 +7,7 @@ Extracted from the credentials router to follow the service layer pattern.
 All functions raise ValueError for business errors (router converts to HTTPException).
 """
 
+import asyncio
 import os
 from typing import Any, Dict, List, Literal
 
@@ -100,6 +101,8 @@ def credential_to_response(
 
 def check_env_configured(provider: str) -> bool:
     """Check if a provider has sufficient env vars configured for migration."""
+    if provider == "chatgpt_siwc":
+        return False  # A local OAuth session is never an API-key environment migration.
     config = PROVIDER_ENV_CONFIG.get(provider)
     if not config:
         return False
@@ -275,6 +278,18 @@ async def test_credential(credential_id: str) -> dict:
 
         provider = cred.provider.lower()
 
+        if provider == "chatgpt_siwc":
+            from open_notebook.ai.siwc_auth import SIWCSession
+
+            catalog = await asyncio.to_thread(
+                SIWCSession().models, config.get("siwc_client_id")
+            )
+            return {
+                "provider": provider,
+                "success": True,
+                "message": f"Connected. {len(catalog)} account models available.",
+            }
+
         # Handle special providers
         if provider == "ollama":
             base_url = config.get("base_url", "http://localhost:11434")
@@ -410,6 +425,14 @@ async def discover_with_config(provider: str, config: dict) -> List[dict]:
     Returns model names only — no type classification.
     The user chooses the model type when registering.
     """
+    if provider == "chatgpt_siwc":
+        from open_notebook.ai.siwc_auth import SIWCSession
+
+        catalog = await asyncio.to_thread(
+            SIWCSession().models, config.get("siwc_client_id")
+        )
+        return [{"name": item["slug"], "provider": provider} for item in catalog]
+
     api_key = config.get("api_key")
     base_url = config.get("base_url")
 
@@ -671,8 +694,6 @@ async def discover_with_config(provider: str, config: dict) -> List[dict]:
         if not api_key:
             return []
         try:
-            import asyncio
-
             from esperanto import AIFactory
 
             models = await asyncio.to_thread(

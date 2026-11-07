@@ -21,6 +21,7 @@ env:
 
 jobs:
   extract-version:
+    if: github.repository == 'lfnovo/open-notebook'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}

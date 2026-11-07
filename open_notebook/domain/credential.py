@@ -106,6 +106,8 @@ class Credential(ObjectModel):
         Esperanto's AIFactory methods, overriding env var lookup.
         """
         config: Dict[str, Any] = {}
+        if self.provider == "chatgpt_siwc" and self.config:
+            config["siwc_client_id"] = self.config.get("siwc_client_id")
         if self.api_key:
             config["api_key"] = self.api_key.get_secret_value()
         if self.base_url:

@@ -89,6 +89,13 @@ _PROVIDER_SPECS: Tuple[ProviderSpec, ...] = (
         openai_compat_discovery_url="https://api.openai.com/v1/models",
     ),
     ProviderSpec(
+        name="chatgpt_siwc",
+        display_name="ChatGPT (official SIWC, CLI prototype)",
+        modalities=_LANGUAGE_ONLY,
+        required_env=("OPEN_NOTEBOOK_SIWC_AUTH_DIR", "OPEN_NOTEBOOK_SIWC_PROXY"),
+        docs_url="https://developers.openai.com/siwc/token-sharing-open-source",
+    ),
+    ProviderSpec(
         name="anthropic",
         display_name="Anthropic",
         modalities=_LANGUAGE_ONLY,

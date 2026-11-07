@@ -29,6 +29,12 @@ async def _resolve_model_config(
 
         await provision_provider_keys(model.provider)
     provider = model.provider
+    if provider == "chatgpt_siwc":
+        from open_notebook.ai.siwc_auth import SIWCConfigurationError
+
+        raise SIWCConfigurationError(
+            "SIWC podcast text generation is not enabled in this text-chat prototype."
+        )
     if provider == "anthropic_compatible":
         provider, config = await resolve_anthropic_compatible_config(config)
     if max_tokens is not None:

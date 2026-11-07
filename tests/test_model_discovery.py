@@ -69,6 +69,7 @@ class TestOpenAICompatTable:
     def test_provider_discovery_functions_keys_unchanged(self):
         assert set(PROVIDER_DISCOVERY_FUNCTIONS) == {
             "openai",
+            "chatgpt_siwc",
             "anthropic",
             "google",
             "ollama",

@@ -129,7 +129,8 @@ async def process_source_command(
                 "apply_transformations": transformations,
                 "embed": input_data.embed,
                 "source_id": input_data.source_id,  # Add the source_id to the state
-            }
+            },
+            config=RunnableConfig(max_concurrency=1),
         )
 
         processed_source = result["source"]
