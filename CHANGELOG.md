@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.15.1-siwc.1] - 2026-11-07
+
 ### Added
 - Opt-in offline Russian/English OCR for image-only PDFs, preserving originals and processing one page at a time.
 - **Unofficial local SIWC prototype:** connect an eligible personal ChatGPT plan through the official sign-in flow, discover account models, and use text chat, Ask, and transformations with explicit background consent. Tokens stay local; embeddings and TTS remain independent. Podcast text, tools, and multimodal requests are not supported.

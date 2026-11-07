@@ -1,5 +1,42 @@
 > **Unofficial SIWC fork.** Adds official Sign in with ChatGPT for personal subscriptions, text chat, Ask, and document transformations. Embeddings and OCR can run locally. [Setup, limitations, and tests](open_notebook/ai/SIWC.md). The MIT license is retained; no endorsement by OpenAI or the Open Notebook author is implied.
 
+## Fork version
+
+- **Fork release:** `v1.15.1-siwc.1` (preview, source release).
+- **Upstream base:** [Open Notebook v1.15.1](https://github.com/lfnovo/open-notebook/releases/tag/v1.15.1), the latest stable upstream release as of **2026-11-07**.
+- Future upstream releases require a reviewed merge and compatibility CI; this fork does not update itself automatically.
+
+## Connect your ChatGPT subscription
+
+```text
+Local app -> ChatGPT sign-in -> your account's models -> chat / document jobs
+```
+
+1. Build the image and create `../open-notebook-private/runtime.env` outside the repository. Set unique `OPEN_NOTEBOOK_ENCRYPTION_KEY` and `SURREAL_PASSWORD` values, plus `OPEN_NOTEBOOK_SIWC_PROXY` pointing to an HTTP proxy reachable from Docker. This fork requires an explicit proxy.
+
+   ```sh
+   docker build -f Dockerfile.siwc -t open-notebook-siwc:prototype .
+   ```
+
+2. Start the app and its temporary sign-in listener:
+
+   ```sh
+   docker compose --env-file ../open-notebook-private/runtime.env -f examples/docker-compose-siwc.yml up -d app
+   docker compose --env-file ../open-notebook-private/runtime.env -f examples/docker-compose-siwc.yml --profile login run --rm --service-ports auth
+   ```
+
+3. Open `http://127.0.0.1:18557/start` in a browser on the same machine, sign in with your own eligible ChatGPT account, and review consent. No OpenAI API key is required for this provider. To opt in to automatic document jobs, replace the final `auth` in the login command with `auth login --bind 0.0.0.0 --allow-background`.
+
+4. Register the models available to your account, then open `http://127.0.0.1:8503`, go to **Models**, and select a ChatGPT model for chat and transformations. Configure embeddings and speech separately.
+
+   ```sh
+   docker compose --env-file ../open-notebook-private/runtime.env -f examples/docker-compose-siwc.yml --profile login run --rm auth register
+   ```
+
+Questions and selected document text are sent to OpenAI. Account eligibility, plan limits and OpenAI terms apply. Keep credentials, the private env file and the auth volume out of Git. See [full setup and limitations](open_notebook/ai/SIWC.md).
+
+---
+
 <a id="readme-top"></a>
 
 <!-- [![Contributors][contributors-shield]][contributors-url] -->
