@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unofficial local SIWC prototype:** connect an eligible personal ChatGPT plan through the official sign-in flow, discover account models, and use text chat, Ask, and transformations with explicit background consent. Tokens stay local; embeddings and TTS remain independent. Podcast text, tools, and multimodal requests are not supported.
 
 ### Fixed
+- The SIWC image includes background command changes and optional local OCR dependencies; compatibility CI checks a stable tag without personal credentials.
 - Permit retrying global sources that are not linked to a notebook.
 - Separate bounded persistence and processing lanes, drain active work on worker shutdown, and isolate foreground SIWC inference from background transformations.
 - The local SIWC login listener handles idle browser connections and preserves an active sign-in attempt when the start link is opened more than once.

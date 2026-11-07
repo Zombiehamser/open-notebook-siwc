@@ -5,16 +5,18 @@ on:
       upstream_tag:
         description: Stable upstream tag to test in an isolated checkout
         required: true
-        default: v1.15.0
+        default: v1.15.1
 permissions:
   contents: read
 jobs:
   compatibility:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Merge selected upstream in this temporary checkout
         env:
           UPSTREAM_TAG: ${{ inputs.upstream_tag }}
@@ -25,6 +27,7 @@ jobs:
           git fetch --no-tags https://github.com/lfnovo/open-notebook.git "refs/tags/$UPSTREAM_TAG"
           git merge --no-commit --no-ff FETCH_HEAD
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7
+      - run: uv python install
       - run: uv sync --locked
       - run: uv run pytest tests/
       - run: uv run ruff check .
@@ -33,5 +36,5 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 22
-      - run: npm ci && npm run test && npm run lint && npm run build
+      - run: npm ci && npm run test:coverage && npm run lint && npm run build
         working-directory: frontend

@@ -1,4 +1,4 @@
-This is an unofficial, local, text-only prototype based on Open Notebook 1.15.0.
+This is an unofficial, local, text-only prototype based on Open Notebook 1.15.1.
 It uses the documented SIWC OAuth flow and public Responses endpoint. It does
 not copy OpenAI Devkit code or use browser cookies or another app's login.
 
@@ -41,7 +41,7 @@ Open Notebook deployment serving other people's requests.
 After sign-in, use `docker compose ... run --rm auth models` to inspect the live
 catalog and `docker compose ... run --rm auth register` to register its language
 models. Registration does not change defaults. In Open Notebook select an
-available SIWC model for chat, transformations, tools/Ask and large-context text.
+available SIWC model for chat, transformations, Ask and large-context text.
 Keep embedding and speech models configured separately. For status or logout,
 use `docker compose ... run --rm auth status` or `... auth logout`.
 
@@ -74,3 +74,23 @@ Devkit is not bundled or relicensed. Do not turn this provider into a general
 subscription gateway, pool accounts or bypass limits. Requests require an
 explicit configured proxy; this is not a universal network firewall for arbitrary
 third-party code running in the container.
+
+## Scheduling, OCR, and upstream maintenance
+
+The worker has one processing lane and one persistence/embedding lane. SIWC
+permits one foreground and one background inference concurrently; account limits
+still apply. Shutdown drains active work. Run one worker per shared data directory.
+Set OPEN_NOTEBOOK_LOCAL_PDF_OCR=true for offline Russian/English PDF OCR with
+Tesseract and Poppler. Originals are retained; handwritten marks require checking.
+Runtime package license notices are included; publishing a container also requires
+complying with package source-availability obligations. The Python code remains MIT.
+
+Personal configuration, tokens, documents, backups and operational branches must
+stay outside this public repository. Fork contributions use a public GitHub
+noreply identity; upstream history is preserved.
+
+Run the SIWC upstream compatibility workflow with a stable tag to check updates.
+It merges into a temporary checkout and runs backend tests/lint/types and frontend
+tests/lint/build. It does not push merges, publish images, sign in, or use personal
+model credentials. After success, review and merge upstream in a separate branch;
+back up data before manually updating the runtime.
